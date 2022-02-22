@@ -2,6 +2,103 @@
 /******/ 	"use strict";
 /******/ 	var __webpack_modules__ = ({
 
+/***/ "./js/getData.js":
+/*!***********************!*\
+  !*** ./js/getData.js ***!
+  \***********************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "getData": () => (/* binding */ getData)
+/* harmony export */ });
+var planetsData = [];
+
+function fetchUrl(url) {
+  return fetch(url).then(function (resp) {
+    return resp.json();
+  })["catch"](function (err) {
+    return console.log(err);
+  });
+}
+
+function fetchUrls(urls) {
+  return Promise.all(urls.map(function (url) {
+    return fetchUrl(url);
+  }));
+}
+
+function getPlanets(dataUrl) {
+  return fetchUrl(dataUrl);
+}
+
+function getResidents(planets) {
+  var promises = [];
+  planets.forEach(function (planet) {
+    // console.log("loading residents for", planet.name);
+    var obj = {
+      planet: planet.name
+    };
+    var promise = fetchUrls(planet.residents).then(function (residents) {
+      if (residents) {
+        obj.residents = residents.map(function (resident) {
+          return {
+            residentName: resident.name
+          };
+        });
+        return getSpecies(residents, obj);
+      }
+    });
+    planetsData.push(obj);
+    promises.push(promise);
+  });
+  return Promise.all(promises);
+}
+
+function getSpecies(residents, residentInfo) {
+  var promises = [];
+  residents.forEach(function (resident, index) {
+    // console.log("loading species for", resident.name);
+    if (resident.species.length) {
+      var promise = fetchUrl(resident.species[0]).then(function (data) {
+        residentInfo.residents[index].species = data.name;
+      });
+      promises.push(promise);
+    } else {
+      residentInfo.residents[index].species = "Human";
+    }
+  });
+  return Promise.all(promises);
+}
+
+function getData(dataUrl) {
+  getPlanets(dataUrl).then(function (planets) {
+    return getResidents(planets.results);
+  }).then(function () {
+    var resultData = [];
+    planetsData.forEach(function (planet) {
+      if (planet.residents.length > 1) {
+        planet.residents.forEach(function (resident) {
+          resultData.push({
+            planet: planet.planet,
+            resident: resident.residentName,
+            species: resident.species
+          });
+        });
+      } else {
+        resultData.push({
+          planet: planet.planet,
+          resident: "-----",
+          species: "-----"
+        });
+      }
+    });
+    console.log(resultData);
+  });
+}
+
+/***/ }),
+
 /***/ "./index.html":
 /*!********************!*\
   !*** ./index.html ***!
@@ -12,51 +109,10 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
-/* harmony import */ var _node_modules_html_loader_dist_runtime_getUrl_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../node_modules/html-loader/dist/runtime/getUrl.js */ "../node_modules/html-loader/dist/runtime/getUrl.js");
-/* harmony import */ var _node_modules_html_loader_dist_runtime_getUrl_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_html_loader_dist_runtime_getUrl_js__WEBPACK_IMPORTED_MODULE_0__);
-// Imports
-
-var ___HTML_LOADER_IMPORT_0___ = new URL(/* asset import */ __webpack_require__(/*! ./images/basket.svg */ "./images/basket.svg"), __webpack_require__.b);
 // Module
-var ___HTML_LOADER_REPLACEMENT_0___ = _node_modules_html_loader_dist_runtime_getUrl_js__WEBPACK_IMPORTED_MODULE_0___default()(___HTML_LOADER_IMPORT_0___);
-var code = "<!doctype html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"UTF-8\">\n  <meta name=\"viewport\"\n        content=\"width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0\">\n  <meta http-equiv=\"X-UA-Compatible\" content=\"ie=edge\">\n  <title>Document</title>\n</head>\n<body>\n<img src=\"" + ___HTML_LOADER_REPLACEMENT_0___ + "\" alt=\"img\">\n</body>\n</html>\n";
+var code = "<!doctype html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"UTF-8\">\n  <meta name=\"viewport\"\n        content=\"width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0\">\n  <meta http-equiv=\"X-UA-Compatible\" content=\"ie=edge\">\n\n<!-- fonts -->\n  <link rel=\"preconnect\" href=\"https://fonts.googleapis.com\">\n  <link rel=\"preconnect\" href=\"https://fonts.gstatic.com\" crossorigin>\n  <link href=\"https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap\" rel=\"stylesheet\">\n\n  <title>Document</title>\n</head>\n<body>\n  <div class=\"main-container\">\n    <h1 class=\"mg-bottom header\">Star Wars</h1>\n\n    <hr class=\"mg-bottom line\">\n\n    <table class=\"mg-bottom sw-table\">\n      <tr class=\"table-row\">\n        <td class=\"table-cell\">№</td>\n        <td class=\"table-cell\">Planet</td>\n        <td class=\"table-cell\">Resident</td>\n        <td class=\"table-cell\">Species</td>\n      </tr>\n    </table>\n\n    <div class=\"pages-container\">\n      <p>Pages:</p>\n\n      <button class=\"page-button\">1</button>\n      <button class=\"page-button\">2</button>\n      <button class=\"page-button\">3</button>\n      <button class=\"page-button\">4</button>\n      <button class=\"page-button\">5</button>\n      <button class=\"page-button\">6</button>\n    </div>\n  </div>\n</body>\n</html>\n";
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (code);
-
-/***/ }),
-
-/***/ "../node_modules/html-loader/dist/runtime/getUrl.js":
-/*!**********************************************************!*\
-  !*** ../node_modules/html-loader/dist/runtime/getUrl.js ***!
-  \**********************************************************/
-/***/ ((module) => {
-
-
-
-module.exports = function (url, options) {
-  if (!options) {
-    // eslint-disable-next-line no-param-reassign
-    options = {};
-  }
-
-  if (!url) {
-    return url;
-  } // eslint-disable-next-line no-underscore-dangle, no-param-reassign
-
-
-  url = String(url.__esModule ? url.default : url);
-
-  if (options.hash) {
-    // eslint-disable-next-line no-param-reassign
-    url += options.hash;
-  }
-
-  if (options.maybeNeedQuotes && /[\t\n\f\r "'=<>`]/.test(url)) {
-    return "\"".concat(url, "\"");
-  }
-
-  return url;
-};
 
 /***/ }),
 
@@ -69,16 +125,6 @@ module.exports = function (url, options) {
 __webpack_require__.r(__webpack_exports__);
 // extracted by mini-css-extract-plugin
 
-
-/***/ }),
-
-/***/ "./images/basket.svg":
-/*!***************************!*\
-  !*** ./images/basket.svg ***!
-  \***************************/
-/***/ ((module, __unused_webpack_exports, __webpack_require__) => {
-
-module.exports = __webpack_require__.p + "./images/basket.svg";
 
 /***/ })
 
@@ -108,22 +154,7 @@ module.exports = __webpack_require__.p + "./images/basket.svg";
 /******/ 		return module.exports;
 /******/ 	}
 /******/ 	
-/******/ 	// expose the modules object (__webpack_modules__)
-/******/ 	__webpack_require__.m = __webpack_modules__;
-/******/ 	
 /************************************************************************/
-/******/ 	/* webpack/runtime/compat get default export */
-/******/ 	(() => {
-/******/ 		// getDefaultExport function for compatibility with non-harmony modules
-/******/ 		__webpack_require__.n = (module) => {
-/******/ 			var getter = module && module.__esModule ?
-/******/ 				() => (module['default']) :
-/******/ 				() => (module);
-/******/ 			__webpack_require__.d(getter, { a: getter });
-/******/ 			return getter;
-/******/ 		};
-/******/ 	})();
-/******/ 	
 /******/ 	/* webpack/runtime/define property getters */
 /******/ 	(() => {
 /******/ 		// define getter functions for harmony exports
@@ -134,18 +165,6 @@ module.exports = __webpack_require__.p + "./images/basket.svg";
 /******/ 				}
 /******/ 			}
 /******/ 		};
-/******/ 	})();
-/******/ 	
-/******/ 	/* webpack/runtime/global */
-/******/ 	(() => {
-/******/ 		__webpack_require__.g = (function() {
-/******/ 			if (typeof globalThis === 'object') return globalThis;
-/******/ 			try {
-/******/ 				return this || new Function('return this')();
-/******/ 			} catch (e) {
-/******/ 				if (typeof window === 'object') return window;
-/******/ 			}
-/******/ 		})();
 /******/ 	})();
 /******/ 	
 /******/ 	/* webpack/runtime/hasOwnProperty shorthand */
@@ -164,52 +183,6 @@ module.exports = __webpack_require__.p + "./images/basket.svg";
 /******/ 		};
 /******/ 	})();
 /******/ 	
-/******/ 	/* webpack/runtime/publicPath */
-/******/ 	(() => {
-/******/ 		var scriptUrl;
-/******/ 		if (__webpack_require__.g.importScripts) scriptUrl = __webpack_require__.g.location + "";
-/******/ 		var document = __webpack_require__.g.document;
-/******/ 		if (!scriptUrl && document) {
-/******/ 			if (document.currentScript)
-/******/ 				scriptUrl = document.currentScript.src
-/******/ 			if (!scriptUrl) {
-/******/ 				var scripts = document.getElementsByTagName("script");
-/******/ 				if(scripts.length) scriptUrl = scripts[scripts.length - 1].src
-/******/ 			}
-/******/ 		}
-/******/ 		// When supporting browsers where an automatic publicPath is not supported you must specify an output.publicPath manually via configuration
-/******/ 		// or pass an empty string ("") and set the __webpack_public_path__ variable from your code to use your own logic.
-/******/ 		if (!scriptUrl) throw new Error("Automatic publicPath is not supported in this browser");
-/******/ 		scriptUrl = scriptUrl.replace(/#.*$/, "").replace(/\?.*$/, "").replace(/\/[^\/]+$/, "/");
-/******/ 		__webpack_require__.p = scriptUrl + "../";
-/******/ 	})();
-/******/ 	
-/******/ 	/* webpack/runtime/jsonp chunk loading */
-/******/ 	(() => {
-/******/ 		__webpack_require__.b = document.baseURI || self.location.href;
-/******/ 		
-/******/ 		// object to store loaded and loading chunks
-/******/ 		// undefined = chunk not loaded, null = chunk preloaded/prefetched
-/******/ 		// [resolve, reject, Promise] = chunk loading, 0 = chunk loaded
-/******/ 		var installedChunks = {
-/******/ 			"main": 0
-/******/ 		};
-/******/ 		
-/******/ 		// no chunk on demand loading
-/******/ 		
-/******/ 		// no prefetching
-/******/ 		
-/******/ 		// no preloaded
-/******/ 		
-/******/ 		// no HMR
-/******/ 		
-/******/ 		// no HMR manifest
-/******/ 		
-/******/ 		// no on chunks loaded
-/******/ 		
-/******/ 		// no jsonp function
-/******/ 	})();
-/******/ 	
 /************************************************************************/
 var __webpack_exports__ = {};
 // This entry need to be wrapped in an IIFE because it need to be isolated against other modules in the chunk.
@@ -220,8 +193,12 @@ var __webpack_exports__ = {};
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _scss_main_scss__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../scss/main.scss */ "./scss/main.scss");
 /* harmony import */ var _index_html__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../index.html */ "./index.html");
+/* harmony import */ var _getData__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./getData */ "./js/getData.js");
 
 
+
+var data = "https://swapi.dev/api/planets/";
+(0,_getData__WEBPACK_IMPORTED_MODULE_2__.getData)(data);
 })();
 
 /******/ })()
