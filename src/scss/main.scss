@@ -1,5 +1,87 @@
+* {
+	padding: 0;
+	margin: 0;
+}
+
+html {
+	font-size: 10px;
+}
+
 body {
-  background-color: red;
-	background-image: url("../images/basket.svg");
-	color: red;
+	font-family: 'Roboto', sans-serif;
+	background-color: #eee;
+}
+
+.mg-bottom {
+	margin-bottom: 2.5rem;
+}
+
+.main-container {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	width: 120rem;
+	margin: 0 auto;
+	padding: 4rem 0 0;
+	text-align: center;
+	font-size: 2rem;
+}
+
+.header {
+	font-size: 5rem;
+}
+
+.line {
+	border: none;
+	border-top: 2px solid #333;
+	width: 100%;
+}
+
+.sw-table {
+	border: 1px solid #333;
+	border-spacing: 0;
+}
+
+.table-row {
+	&:first-child {
+		font-weight: 900;
+
+		.table-cell {
+			background-color: #c7c7c7;
+		}
+	}
+}
+
+.table-cell {
+	border: 1px solid #333;
+	background-color: #ffffff;
+	width: 25rem;
+	padding: 1rem;
+}
+
+.pages-container {
+	display: flex;
+	align-items: center;
+	width: 100%;
+
+	p {
+		padding: 0 1.5rem;
+	}
+
+	.page-button {
+		padding: .5rem 1rem;
+		font-size: 1.5rem;
+		border: 1px solid #333;
+		border-radius: 5px;
+		background-color: #fff;
+		margin-right: 1rem;
+
+		&:hover {
+			background-color: #ddd;
+		}
+
+		&:active {
+			background-color: #c7c7c7;
+		}
+	}
 }
