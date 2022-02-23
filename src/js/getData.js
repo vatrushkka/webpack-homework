@@ -1,87 +1,75 @@
-let planetsData = [];
+import "core-js/stable";
+import "regenerator-runtime/runtime";
 
-function fetchUrl(url) {
-  return fetch(url)
+const fetchUrl = async (url) => {
+  return await fetch(url)
     .then((resp) => resp.json())
     .catch((err) => console.log(err));
-}
+};
 
-function fetchUrls(urls) {
-  return Promise.all(urls.map((url) => fetchUrl(url)));
-}
+const fetchUrls = async (urls) => {
+  return await Promise.all(urls.map((url) => fetchUrl(url)));
+};
 
-function getPlanets(dataUrl) {
-  return fetchUrl(dataUrl);
-}
+const getPlanets = async (url) => {
+  console.log("Planets are loading...");
+  return await fetchUrl(url);
+};
 
-function getResidents(planets) {
-  let promises = [];
+const getResidents = async (planets) => {
+  return await Promise.all(
+    planets.results
+      // .filter(el => el.residents.length > 0)
+      .map(async (planet) => {
+        // console.info(`Residents for ${planet.name} are loading`);
+        let residents = await fetchUrls(planet.residents);
 
-  planets.forEach((planet) => {
-    // console.log("loading residents for", planet.name);
-    let obj = { planet: planet.name };
-
-    let promise = fetchUrls(planet.residents).then((residents) => {
-      if (residents) {
-        obj.residents = residents.map((resident) => ({
-          residentName: resident.name,
-        }));
-
-        return getSpecies(residents, obj);
-      }
-    });
-
-    planetsData.push(obj);
-    promises.push(promise);
-  });
-
-  return Promise.all(promises);
-}
-
-function getSpecies(residents, residentInfo) {
-  let promises = [];
-
-  residents.forEach((resident, index) => {
-    // console.log("loading species for", resident.name);
-    if (resident.species.length) {
-      let promise = fetchUrl(resident.species[0]).then((data) => {
-        residentInfo.residents[index].species = data.name;
-      });
-
-      promises.push(promise);
-    } else {
-      residentInfo.residents[index].species = "Human";
-    }
-  });
-
-  return Promise.all(promises);
-}
-
-export function getData(dataUrl) {
-  getPlanets(dataUrl)
-    .then((planets) => {
-      return getResidents(planets.results);
-    })
-    .then(() => {
-      let resultData = [];
-
-      planetsData.forEach((planet) => {
-        if (planet.residents.length > 1) {
-          planet.residents.forEach((resident) => {
-            resultData.push({
-              planet: planet.planet,
-              resident: resident.residentName,
-              species: resident.species,
-            });
-          });
+        if (residents.length) {
+          return residents.map((resident) => ({
+            planet: planet.name,
+            residentName: resident.name,
+            species: resident.species,
+          }));
         } else {
-          resultData.push({
-            planet: planet.planet,
-            resident: "-----",
+          return {
+            planet: planet.name,
+            residentName: "-----",
             species: "-----",
-          });
+          };
         }
-      });
-      console.log(resultData);
-    });
-}
+      })
+  );
+};
+
+const getSpecies = async (residents) => {
+  return await Promise.all(
+    [].concat(...residents).map(async (resident) => {
+      if (resident.species.length === 0) {
+        return {
+          planet: resident.planet,
+          residentName: resident.residentName,
+          species: "Human",
+        };
+      } else if (resident.species === "-----") {
+        return resident;
+      } else {
+        // console.info(`Species for ${resident.residentName} are loading`);
+        let species = await fetchUrl(resident.species);
+        return {
+          planet: resident.planet,
+          residentName: resident.residentName,
+          species: species.name,
+        };
+      }
+    })
+  );
+};
+
+const getData = async (url) => {
+  const planets = await getPlanets(url);
+  const residents = await getResidents(planets);
+
+  return await getSpecies(residents);
+};
+
+export default getData;

@@ -4,7 +4,7 @@
 }
 
 html {
-	font-size: 10px;
+	font-size: 8px;
 }
 
 body {
@@ -22,7 +22,7 @@ body {
 	align-items: center;
 	width: 120rem;
 	margin: 0 auto;
-	padding: 4rem 0 0;
+	padding: 4rem 0;
 	text-align: center;
 	font-size: 2rem;
 }
@@ -66,22 +66,34 @@ body {
 
 	p {
 		padding: 0 1.5rem;
+		font-size: 2.2rem;
+		font-weight: 500;
+	}
+
+	.button-pages-container {
+		pointer-events: none;
 	}
 
 	.page-button {
 		padding: .5rem 1rem;
-		font-size: 1.5rem;
-		border: 1px solid #333;
+		font-weight: 600;
+		font-size: 2rem;
+		color: #818181;
+		border: 2px solid #333;
 		border-radius: 5px;
 		background-color: #fff;
 		margin-right: 1rem;
+		pointer-events: auto;
 
 		&:hover {
 			background-color: #ddd;
+			color: #333;
 		}
+	}
 
-		&:active {
-			background-color: #c7c7c7;
-		}
+	.page-button-active,
+	.page-button-active:hover {
+		background-color: #c7c7c7;
+		color: #000;
 	}
 }
