@@ -6,7 +6,7 @@
   margin: 0; }
 
 html {
-  font-size: 10px; }
+  font-size: 8px; }
 
 body {
   font-family: 'Roboto', sans-serif;
@@ -21,7 +21,7 @@ body {
   align-items: center;
   width: 120rem;
   margin: 0 auto;
-  padding: 4rem 0 0;
+  padding: 4rem 0;
   text-align: center;
   font-size: 2rem; }
 
@@ -48,23 +48,47 @@ body {
   width: 25rem;
   padding: 1rem; }
 
+.loader-active {
+  border: 20px solid #fff;
+  border-top: 20px solid #c7c7c7;
+  border-radius: 50%;
+  width: 80px;
+  height: 80px;
+  animation: spin 2s linear infinite; }
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg); }
+  100% {
+    transform: rotate(360deg); } }
+
 .pages-container {
   display: flex;
   align-items: center;
   width: 100%; }
   .pages-container p {
-    padding: 0 1.5rem; }
+    padding: 0 1.5rem;
+    font-size: 2.2rem;
+    font-weight: 500; }
+  .pages-container .button-pages-container {
+    pointer-events: none; }
   .pages-container .page-button {
     padding: .5rem 1rem;
-    font-size: 1.5rem;
-    border: 1px solid #333;
+    font-weight: 600;
+    font-size: 2rem;
+    color: #818181;
+    border: 2px solid #333;
     border-radius: 5px;
     background-color: #fff;
-    margin-right: 1rem; }
+    margin-right: 1rem;
+    pointer-events: auto; }
     .pages-container .page-button:hover {
-      background-color: #ddd; }
-    .pages-container .page-button:active {
-      background-color: #c7c7c7; }
+      background-color: #ddd;
+      color: #333; }
+  .pages-container .page-button-active,
+  .pages-container .page-button-active:hover {
+    background-color: #c7c7c7;
+    color: #000; }
 
 
 /*# sourceMappingURL=main.css.map*/
