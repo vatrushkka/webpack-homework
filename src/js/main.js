@@ -6,16 +6,12 @@ let dataUrl = "https://swapi.dev/api/planets/?page=";
 
 const table = document.querySelector(".sw-table");
 const pageButtons = document.querySelector(".button-pages-container");
+const loader = document.querySelector(".loader");
 
-// document.addEventListener("DOMContentLoaded", getData(`${dataUrl}1`).then(data => loadTable(data)));
 pageButtons.addEventListener("click", () => buttonClick(event.target));
 
-async function loadTable(data) {
-  clearTable();
-  let items = data;
-  console.log(items);
-
-  items.forEach(({ planet, residentName, species }, index) => {
+function loadTable(residents) {
+  residents.forEach(({ planet, residentName, species }, index) => {
     const tableResident = getResident(index + 1, planet, residentName, species);
 
     table.appendChild(tableResident);
@@ -23,6 +19,10 @@ async function loadTable(data) {
 }
 
 function buttonClick(targetButton) {
+  clearTable();
+
+  loader.classList.add("loader-active");
+
   let previousButton = pageButtons.querySelector(".page-button-active");
   if (previousButton) {
     previousButton.classList.remove("page-button-active");
@@ -30,10 +30,11 @@ function buttonClick(targetButton) {
 
   if (previousButton !== targetButton) {
     let page = targetButton.innerText;
-    console.log(targetButton.innerText);
-    getData(`${dataUrl}${page}`).then((data) => loadTable(data));
+    getData(`${dataUrl}${page}`).then((data) => {
+      loadTable(data);
+      loader.classList.remove("loader-active");
+    });
   }
-
   targetButton.classList.add("page-button-active");
 }
 

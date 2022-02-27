@@ -12,32 +12,28 @@ const fetchUrls = async (urls) => {
 };
 
 const getPlanets = async (url) => {
-  console.log("Planets are loading...");
   return await fetchUrl(url);
 };
 
 const getResidents = async (planets) => {
   return await Promise.all(
-    planets.results
-      // .filter(el => el.residents.length > 0)
-      .map(async (planet) => {
-        // console.info(`Residents for ${planet.name} are loading`);
-        let residents = await fetchUrls(planet.residents);
+    planets.results.map(async (planet) => {
+      let residents = await fetchUrls(planet.residents);
 
-        if (residents.length) {
-          return residents.map((resident) => ({
-            planet: planet.name,
-            residentName: resident.name,
-            species: resident.species,
-          }));
-        } else {
-          return {
-            planet: planet.name,
-            residentName: "-----",
-            species: "-----",
-          };
-        }
-      })
+      if (residents.length) {
+        return residents.map((resident) => ({
+          planet: planet.name,
+          residentName: resident.name,
+          species: resident.species,
+        }));
+      } else {
+        return {
+          planet: planet.name,
+          residentName: "-----",
+          species: "-----",
+        };
+      }
+    })
   );
 };
 
@@ -53,7 +49,6 @@ const getSpecies = async (residents) => {
       } else if (resident.species === "-----") {
         return resident;
       } else {
-        // console.info(`Species for ${resident.residentName} are loading`);
         let species = await fetchUrl(resident.species);
         return {
           planet: resident.planet,
