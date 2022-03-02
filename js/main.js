@@ -10,7 +10,8 @@
 
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */   "getData": () => (/* binding */ getData),
+/* harmony export */   "getResident": () => (/* binding */ getResident)
 /* harmony export */ });
 /* harmony import */ var core_js_stable__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! core-js/stable */ "../node_modules/core-js/stable/index.js");
 /* harmony import */ var core_js_stable__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(core_js_stable__WEBPACK_IMPORTED_MODULE_0__);
@@ -35,6 +36,16 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
 
 
+function getOnlyFulFilled(allResults) {
+  var fulfilledResult = [];
+  allResults.forEach(function (result) {
+    if (result.status === "fulfilled") {
+      fulfilledResult.push(result.value);
+    }
+  });
+  return fulfilledResult;
+}
+
 var fetchUrl = /*#__PURE__*/function () {
   var _ref = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee(url) {
     return regeneratorRuntime.wrap(function _callee$(_context) {
@@ -45,7 +56,7 @@ var fetchUrl = /*#__PURE__*/function () {
             return fetch(url).then(function (resp) {
               return resp.json();
             })["catch"](function (err) {
-              return console.log(err);
+              return new Error(err);
             });
 
           case 2:
@@ -71,9 +82,11 @@ var fetchUrls = /*#__PURE__*/function () {
         switch (_context2.prev = _context2.next) {
           case 0:
             _context2.next = 2;
-            return Promise.all(urls.map(function (url) {
+            return Promise.allSettled(urls.map(function (url) {
               return fetchUrl(url);
-            }));
+            })).then(function (results) {
+              return getOnlyFulFilled(results);
+            });
 
           case 2:
             return _context2.abrupt("return", _context2.sent);
@@ -194,7 +207,7 @@ var getSpecies = /*#__PURE__*/function () {
         switch (_context7.prev = _context7.next) {
           case 0:
             _context7.next = 2;
-            return Promise.all((_ref7 = []).concat.apply(_ref7, _toConsumableArray(residents)).map( /*#__PURE__*/function () {
+            return Promise.allSettled((_ref7 = []).concat.apply(_ref7, _toConsumableArray(residents)).map( /*#__PURE__*/function () {
               var _ref8 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee6(resident) {
                 var species;
                 return regeneratorRuntime.wrap(function _callee6$(_context6) {
@@ -243,7 +256,9 @@ var getSpecies = /*#__PURE__*/function () {
               return function (_x7) {
                 return _ref8.apply(this, arguments);
               };
-            }()));
+            }())).then(function (results) {
+              return getOnlyFulFilled(results);
+            });
 
           case 2:
             return _context7.abrupt("return", _context7.sent);
@@ -296,62 +311,6 @@ var getData = /*#__PURE__*/function () {
     return _ref9.apply(this, arguments);
   };
 }();
-
-/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (getData);
-
-/***/ }),
-
-/***/ "./js/main.js":
-/*!********************!*\
-  !*** ./js/main.js ***!
-  \********************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-__webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _scss_main_scss__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../scss/main.scss */ "./scss/main.scss");
-/* harmony import */ var _index_html__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../index.html */ "./index.html");
-/* harmony import */ var _getData__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./getData */ "./js/getData.js");
-
-
-
-var dataUrl = "https://swapi.dev/api/planets/?page=";
-var table = document.querySelector(".sw-table");
-var pageButtons = document.querySelector(".button-pages-container");
-var loader = document.querySelector(".loader");
-pageButtons.addEventListener("click", function () {
-  return buttonClick(event.target);
-});
-
-function loadTable(residents) {
-  residents.forEach(function (_ref, index) {
-    var planet = _ref.planet,
-        residentName = _ref.residentName,
-        species = _ref.species;
-    var tableResident = getResident(index + 1, planet, residentName, species);
-    table.appendChild(tableResident);
-  });
-}
-
-function buttonClick(targetButton) {
-  clearTable();
-  loader.classList.add("loader-active");
-  var previousButton = pageButtons.querySelector(".page-button-active");
-
-  if (previousButton) {
-    previousButton.classList.remove("page-button-active");
-  }
-
-  if (previousButton !== targetButton) {
-    var page = targetButton.innerText;
-    (0,_getData__WEBPACK_IMPORTED_MODULE_2__["default"])("".concat(dataUrl).concat(page)).then(function (data) {
-      loadTable(data);
-      loader.classList.remove("loader-active");
-    });
-  }
-
-  targetButton.classList.add("page-button-active");
-}
-
 function getResident(index, planet, resident, species) {
   var tableRow = document.createElement("tr");
   tableRow.classList.add("table-row");
@@ -374,9 +333,62 @@ function getResident(index, planet, resident, species) {
   return tableRow;
 }
 
+/***/ }),
+
+/***/ "./js/main.js":
+/*!********************!*\
+  !*** ./js/main.js ***!
+  \********************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _scss_main_scss__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../scss/main.scss */ "./scss/main.scss");
+/* harmony import */ var _index_html__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../index.html */ "./index.html");
+/* harmony import */ var _getData__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./getData */ "./js/getData.js");
+
+
+
+var dataUrl = "https://swapi.dev/api/planets/?page=";
+var table = document.querySelector(".sw-table");
+var pageButtons = document.querySelector(".button-pages-container");
+var loader = document.querySelector(".loader");
+pageButtons.addEventListener("click", function () {
+  return loadPage(event.target);
+});
+
+function loadPage(targetButton) {
+  clearTable();
+  loader.classList.add("loader-active");
+  var previousButton = pageButtons.querySelector(".page-button-active");
+
+  if (previousButton) {
+    previousButton.classList.remove("page-button-active");
+  }
+
+  if (previousButton !== targetButton) {
+    var page = targetButton.innerText;
+    (0,_getData__WEBPACK_IMPORTED_MODULE_2__.getData)("".concat(dataUrl).concat(page)).then(function (data) {
+      loadTable(data);
+      loader.classList.remove("loader-active");
+    });
+  }
+
+  targetButton.classList.add("page-button-active");
+}
+
+function loadTable(residents) {
+  residents.forEach(function (_ref, index) {
+    var planet = _ref.planet,
+        residentName = _ref.residentName,
+        species = _ref.species;
+    var tableResident = (0,_getData__WEBPACK_IMPORTED_MODULE_2__.getResident)(index + 1, planet, residentName, species);
+    table.appendChild(tableResident);
+  });
+}
+
 function clearTable() {
   table.innerHTML = "";
-  var tableHeader = getResident("№", "Planet", "Resident", "Species");
+  var tableHeader = (0,_getData__WEBPACK_IMPORTED_MODULE_2__.getResident)("№", "Planet", "Resident", "Species");
   table.appendChild(tableHeader);
 }
 
@@ -393,7 +405,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
 // Module
-var code = "<!doctype html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"UTF-8\">\n  <meta name=\"viewport\"\n        content=\"width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0\">\n  <meta http-equiv=\"X-UA-Compatible\" content=\"ie=edge\">\n\n<!-- fonts -->\n  <link rel=\"preconnect\" href=\"https://fonts.googleapis.com\">\n  <link rel=\"preconnect\" href=\"https://fonts.gstatic.com\" crossorigin>\n  <link href=\"https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap\" rel=\"stylesheet\">\n\n  <title>Document</title>\n</head>\n<body>\n  <div class=\"main-container\">\n    <h1 class=\"mg-bottom header\">Star Wars</h1>\n\n    <hr class=\"mg-bottom line\">\n\n    <div class=\"pages-container\">\n      <p>Pages:</p>\n\n      <div class=\"button-pages-container\">\n        <button class=\"page-button\">1</button>\n        <button class=\"page-button\">2</button>\n        <button class=\"page-button\">3</button>\n        <button class=\"page-button\">4</button>\n        <button class=\"page-button\">5</button>\n        <button class=\"page-button\">6</button>\n      </div>\n    </div>\n\n    <hr class=\"mg-bottom line\">\n\n    <table class=\"mg-bottom sw-table\">\n      <tr class=\"table-row\">\n        <td class=\"table-cell\">№</td>\n        <td class=\"table-cell\">Planet</td>\n        <td class=\"table-cell\">Resident</td>\n        <td class=\"table-cell\">Species</td>\n      </tr>\n    </table>\n\n    <div class=\"loader\"></div>\n  </div>\n</body>\n</html>\n";
+var code = "<!doctype html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"UTF-8\">\n  <meta name=\"viewport\"\n        content=\"width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0\">\n  <meta http-equiv=\"X-UA-Compatible\" content=\"ie=edge\">\n\n<!-- fonts -->\n  <link rel=\"preconnect\" href=\"https://fonts.googleapis.com\">\n  <link rel=\"preconnect\" href=\"https://fonts.gstatic.com\" crossorigin>\n  <link href=\"https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap\" rel=\"stylesheet\">\n\n  <title>Document</title>\n</head>\n<body>\n  <div class=\"main-container\">\n    <h1 class=\"mg-bottom header\">Star Wars</h1>\n\n    <hr class=\"mg-bottom line\">\n\n    <div class=\"mg-bottom pages-container\">\n      <p>Pages:</p>\n\n      <div class=\"button-pages-container\">\n        <button class=\"page-button\">1</button>\n        <button class=\"page-button\">2</button>\n        <button class=\"page-button\">3</button>\n        <button class=\"page-button\">4</button>\n        <button class=\"page-button\">5</button>\n        <button class=\"page-button\">6</button>\n      </div>\n    </div>\n\n    <table class=\"mg-bottom sw-table\">\n      <tr class=\"table-row\">\n        <td class=\"table-cell\">№</td>\n        <td class=\"table-cell\">Planet</td>\n        <td class=\"table-cell\">Resident</td>\n        <td class=\"table-cell\">Species</td>\n      </tr>\n    </table>\n\n    <div class=\"loader\"></div>\n  </div>\n</body>\n</html>\n";
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (code);
 
