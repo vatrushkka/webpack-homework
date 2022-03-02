@@ -1,14 +1,26 @@
 import "core-js/stable";
 import "regenerator-runtime/runtime";
 
+function getOnlyFulFilled(allResults) {
+  const fulfilledResult = [];
+  allResults.forEach((result) => {
+    if (result.status === "fulfilled") {
+      fulfilledResult.push(result.value);
+    }
+  });
+  return fulfilledResult;
+}
+
 const fetchUrl = async (url) => {
   return await fetch(url)
     .then((resp) => resp.json())
-    .catch((err) => console.log(err));
+    .catch((err) => new Error(err));
 };
 
 const fetchUrls = async (urls) => {
-  return await Promise.all(urls.map((url) => fetchUrl(url)));
+  return await Promise.allSettled(urls.map((url) => fetchUrl(url))).then(
+    (results) => getOnlyFulFilled(results)
+  );
 };
 
 const getPlanets = async (url) => {
@@ -38,7 +50,7 @@ const getResidents = async (planets) => {
 };
 
 const getSpecies = async (residents) => {
-  return await Promise.all(
+  return await Promise.allSettled(
     [].concat(...residents).map(async (resident) => {
       if (resident.species.length === 0) {
         return {
@@ -57,14 +69,39 @@ const getSpecies = async (residents) => {
         };
       }
     })
-  );
+  ).then((results) => getOnlyFulFilled(results));
 };
 
-const getData = async (url) => {
+export const getData = async (url) => {
   const planets = await getPlanets(url);
   const residents = await getResidents(planets);
 
   return await getSpecies(residents);
 };
 
-export default getData;
+export function getResident(index, planet, resident, species) {
+  const tableRow = document.createElement("tr");
+  tableRow.classList.add("table-row");
+
+  const rowNumber = document.createElement("td");
+  rowNumber.classList.add("table-cell");
+  rowNumber.innerText = index;
+  tableRow.appendChild(rowNumber);
+
+  const rowPlanet = document.createElement("td");
+  rowPlanet.classList.add("table-cell");
+  rowPlanet.innerText = planet;
+  tableRow.appendChild(rowPlanet);
+
+  const rowResident = document.createElement("td");
+  rowResident.classList.add("table-cell");
+  rowResident.innerText = resident;
+  tableRow.appendChild(rowResident);
+
+  const rowSpecies = document.createElement("td");
+  rowSpecies.classList.add("table-cell");
+  rowSpecies.innerText = species;
+  tableRow.appendChild(rowSpecies);
+
+  return tableRow;
+}

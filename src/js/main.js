@@ -1,6 +1,6 @@
 import "../scss/main.scss";
 import "../index.html";
-import getData from "./getData";
+import { getData, getResident } from "./getData";
 
 let dataUrl = "https://swapi.dev/api/planets/?page=";
 
@@ -8,17 +8,9 @@ const table = document.querySelector(".sw-table");
 const pageButtons = document.querySelector(".button-pages-container");
 const loader = document.querySelector(".loader");
 
-pageButtons.addEventListener("click", () => buttonClick(event.target));
+pageButtons.addEventListener("click", () => loadPage(event.target));
 
-function loadTable(residents) {
-  residents.forEach(({ planet, residentName, species }, index) => {
-    const tableResident = getResident(index + 1, planet, residentName, species);
-
-    table.appendChild(tableResident);
-  });
-}
-
-function buttonClick(targetButton) {
+function loadPage(targetButton) {
   clearTable();
 
   loader.classList.add("loader-active");
@@ -38,31 +30,12 @@ function buttonClick(targetButton) {
   targetButton.classList.add("page-button-active");
 }
 
-function getResident(index, planet, resident, species) {
-  const tableRow = document.createElement("tr");
-  tableRow.classList.add("table-row");
+function loadTable(residents) {
+  residents.forEach(({ planet, residentName, species }, index) => {
+    const tableResident = getResident(index + 1, planet, residentName, species);
 
-  const rowNumber = document.createElement("td");
-  rowNumber.classList.add("table-cell");
-  rowNumber.innerText = index;
-  tableRow.appendChild(rowNumber);
-
-  const rowPlanet = document.createElement("td");
-  rowPlanet.classList.add("table-cell");
-  rowPlanet.innerText = planet;
-  tableRow.appendChild(rowPlanet);
-
-  const rowResident = document.createElement("td");
-  rowResident.classList.add("table-cell");
-  rowResident.innerText = resident;
-  tableRow.appendChild(rowResident);
-
-  const rowSpecies = document.createElement("td");
-  rowSpecies.classList.add("table-cell");
-  rowSpecies.innerText = species;
-  tableRow.appendChild(rowSpecies);
-
-  return tableRow;
+    table.appendChild(tableResident);
+  });
 }
 
 function clearTable() {
